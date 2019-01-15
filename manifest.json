@@ -5,12 +5,9 @@
   "content_scripts": [
     {
       "css": [
-        "bootstrap.min.css"
+        "modal.css"
       ],
-      "js": [
-        "jquery.min.js",
-        "bootstrap.min.js"
-      ],
+      "run_at": "document_end",
       "matches": [
         "http://*/*",
         "https://*/*"
@@ -25,6 +22,7 @@
   },
   "background": {
     "scripts": [
+      "jquery.min.js",
       "background.js"
     ],
     "persistent": false

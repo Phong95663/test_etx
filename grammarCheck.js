@@ -1,5 +1,7 @@
 replaceSelectedText();
+document.body.insertAdjacentElement("beforeend", addModal());
 
+var generateModal = ''
 function stringToEl(string) {
   var parser = new DOMParser(),
     content = 'text/html',
@@ -9,9 +11,7 @@ function stringToEl(string) {
 
 function addModal() {
   var modal = document.createElement('div');
-  // modal.className('modal');
-  modal.innerHTML += '<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"><div class="modal-dialog" role = "document"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="exampleModalLabel">Modal title</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><p>Modal body text goes here.</p></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Save changes</button></div></div></div></div>';
-  // modal.innerHTML += '<iframe src="./modal"></iframe>'
+  modal.innerHTML += `<div id="myModal" class="modal"><div class="modal-content"><span class="close-jg">&times;</span><p class="modal-context">Some text in the Modal..</p></div></div >`
   return modal;
 }
 // function highlightRange(range) {
@@ -26,7 +26,7 @@ function addModal() {
 
 function initElement(string) {
   var div = document.createElement('div');
-  // div.className('grammar-box');
+  div.classList.add('grammar-box')
   div.setAttribute(
     "style",
     "background-color: yellow; display: inline;"
@@ -40,16 +40,13 @@ function replaceSelectedText() {
   var sel, range;
   if (window.getSelection) {
     sel = window.getSelection();
-    text = ["abc", "dsfsada", "def"]
+    text = ["abc", "dsfsada", "ンデビュー90周年を記念し"]
     if (sel.rangeCount) {
       range = sel.getRangeAt(0);
-      debugger
       // highlightRange(range);
       range.deleteContents();
-      debugger
-      range.insertNode(addModal());
+      // range.insertNode(addModal());
       range.insertNode(document.createTextNode(text[0]));
-      debugger
       range.insertNode(initElement(text[2]));
     }
   }
@@ -58,3 +55,23 @@ function replaceSelectedText() {
   //   range.text = stringToEl(replacementText);
   // }
 }
+// $(document).ready(function () {
+//   $('body').on('click', $('div.grammar-box'), function () {
+
+//     var modal = document.getElementById('myModal');
+//     modal.toggle();
+//   })
+// })
+function addModalContext() {
+  return `<p>abc</p>`
+}
+$('.modal-context').insertAdjacentHTML("beforeend", addModalContext());
+document.body.getElementsByClassName('grammar-box')[0].addEventListener('click', function () {
+  var modal = document.getElementById('myModal');
+  modal.style.display = "block"
+});
+
+document.body.getElementsByClassName('close-jg')[0].addEventListener('click', function () {
+  var modal = document.getElementById('myModal');
+  modal.style.display = "none"
+})
