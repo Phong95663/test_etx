@@ -15,7 +15,7 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
       chrome.tabs.executeScript(null,
         { file: 'grammarCheck.js' }, function () {
           chrome.tabs.executeScript(null, {
-            file: "modal.js"
+            // file: "modal.js"
           })
         });
     })

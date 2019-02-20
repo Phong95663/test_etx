@@ -37,19 +37,55 @@ function initElement(string) {
 }
 
 function replaceSelectedText() {
-  var sel, range;
   if (window.getSelection) {
-    sel = window.getSelection();
-    text = ["abc", "dsfsada", "ンデビュー90周年を記念し"]
-    if (sel.rangeCount) {
-      range = sel.getRangeAt(0);
-      // highlightRange(range);
-      range.deleteContents();
-      // range.insertNode(addModal());
-      range.insertNode(document.createTextNode(text[0]));
-      range.insertNode(initElement(text[2]));
-    }
+    var dataSend = window.getSelection().baseNode.nodeValue;
   }
+  $.ajax({
+    url: 'http://127.0.0.1:5000/api/v1/grammar_check',
+    type: 'post',
+    dataType: 'text',
+    // contentType: 'application/json',
+    data: dataSend,
+    success: function (result) {
+      console.log(typeof(result));
+      var sel, range;
+      if (window.getSelection) {
+        sel = window.getSelection();
+        var result_arr = JSON.parse(result)
+        console.log(typeof (result_arr));
+        console.log(result_arr[0]);
+        var title = result_arr[0].title;
+        console.log("title: ", title);
+        console.log("type: ", typeof (title));
+        text_add_symbol = dataSend.replace(title, " ~*~ " + title + " ~*~ ");
+        console.log("text_symbol: ", text_add_symbol);
+        console.log("type: ", typeof (text_add_symbol));
+        var text_arr = [];
+        text_arr = text_add_symbol.split(" ~*~ ").reverse();
+        console.log("arr: ", text_arr);
+        console.log(dataSend);
+        if (sel.rangeCount) {
+          range = sel.getRangeAt(0);
+          // highlightRange(range);
+          range.deleteContents();
+          text_arr.forEach(element => {
+            if (element == title) {
+              range.insertNode(initElement(element));
+            } else {
+              range.insertNode(document.createTextNode(element));
+            }
+          });
+          // range.insertNode(addModal());
+          // range.insertNode(document.createTextNode(text[0]));
+          // range.insertNode(initElement(text[2]));
+        }
+      }
+    },
+    error: function () {
+      console.log("Err");
+    }
+  })
+
   // else if (document.selection && document.selection.createRange) {
   //   range = document.selection.createRange();
   //   range.text = stringToEl(replacementText);
@@ -65,7 +101,7 @@ function replaceSelectedText() {
 function addModalContext() {
   return `<p>abc</p>`
 }
-$('.modal-context').insertAdjacentHTML("beforeend", addModalContext());
+document.body.getElementsByClassName('modal-context')[0].insertAdjacentHTML("beforeend", addModalContext());
 document.body.getElementsByClassName('grammar-box')[0].addEventListener('click', function () {
   var modal = document.getElementById('myModal');
   modal.style.display = "block"
@@ -75,3 +111,5 @@ document.body.getElementsByClassName('close-jg')[0].addEventListener('click', fu
   var modal = document.getElementById('myModal');
   modal.style.display = "none"
 })
+
+// function call(input) {
