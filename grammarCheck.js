@@ -1,5 +1,7 @@
 replaceSelectedText();
-document.body.insertAdjacentElement("beforeend", addModal());
+if (document.getElementById('myModal') == null) {
+  document.body.insertAdjacentElement("beforeend", addModal());
+}
 
 var generateModal = ''
 function stringToEl(string) {
@@ -11,7 +13,19 @@ function stringToEl(string) {
 
 function addModal() {
   var modal = document.createElement('div');
-  modal.innerHTML += `<div id="myModal" class="modal"><div class="modal-content"><span class="close-jg">&times;</span><p class="modal-context">Some text in the Modal..</p></div></div >`
+  modal.innerHTML += `<div id="myModal" class="modal"><div class="modal-content"><span class="close-jg">&times;</span><p class="modal-context"><div>
+  <div id="title"></div>
+  <div id="mean"></div>
+  <div id="use"></div>
+  <div id="explain">
+  </div>
+  <div id="example">
+    <div>
+      <ul id="li-example">
+      </ul>
+    </div>
+  </div>
+  </div></p></div></div >`
   return modal;
 }
 // function highlightRange(range) {
@@ -25,15 +39,15 @@ function addModal() {
 // }
 
 function initElement(string) {
-  var div = document.createElement('div');
-  div.classList.add('grammar-box')
-  div.setAttribute(
+  var span = document.createElement('span');
+  span.classList.add('grammar-box')
+  span.setAttribute(
     "style",
     "background-color: yellow; display: inline;"
   );
   text = document.createTextNode(string)
-  div.appendChild(text)
-  return div;
+  span.appendChild(text)
+  return span;
 }
 
 function replaceSelectedText() {
@@ -44,7 +58,6 @@ function replaceSelectedText() {
     url: 'http://127.0.0.1:5000/api/v1/grammar_check',
     type: 'post',
     dataType: 'text',
-    // contentType: 'application/json',
     data: dataSend,
     success: function (result) {
       console.log(typeof(result));
@@ -75,6 +88,52 @@ function replaceSelectedText() {
               range.insertNode(document.createTextNode(element));
             }
           });
+          let elements = document.body.getElementsByClassName('grammar-box');
+          for (let i = 0; i < elements.length; i++) {
+            elements[i].addEventListener('click', function () {
+              var modal = document.getElementById('myModal');
+              modal.style.display = "block";
+              $.ajax({
+                url: `http://127.0.0.1:5000/api/v1/get_grammars?input=${elements[i].textContent}`,
+                type: 'get',
+                // dataType: 'text',
+                // data: dataSend,
+                success: function (data) {
+                  console.log("***********", data);
+                  let data_arr = JSON.parse(data)
+                  console.log(data_arr[0].title);
+                  document.getElementById('title').insertAdjacentHTML("beforeend", addModalContext_String(data_arr[0].title));
+                  console.log(data_arr[0].mean);
+                  document.getElementById('mean').insertAdjacentHTML("beforeend", addModalContext_String(data_arr[0].mean));
+                  console.log(data_arr[0].use);
+                  document.getElementById('use').insertAdjacentHTML("beforeend", addModalContext_String(data_arr[0].use));
+                  console.log(data_arr[0].explain);
+                  document.getElementById('explain').insertAdjacentHTML("beforeend", addModalContext_String(data_arr[0].explain));
+                  console.log(data_arr[0].examples);
+                  for (let i = 0; i < data_arr[0].examples.length; i++) {
+                    document.getElementById('li-example').insertAdjacentHTML("beforeend", addModalContext_Example(data_arr[0].examples[i].ja, data_arr[0].examples[i].vi));
+                  }
+                  document.getElementById('li-example').insertAdjacentHTML("beforeend", addModalContext_Example(data_arr[0].examples[i].ja, data_arr[0].examples[i].vi));
+                  console.log(data_arr[0].examples.length);
+                  console.log(data_arr[0].examples[0].ja);
+                  console.log(data_arr[0].examples[1].vi);
+                  console.log(data_arr[0].examples[2].vi);
+
+                }
+              });
+            });
+          }
+          document.body.getElementsByClassName('close-jg')[0].addEventListener('click', function () {
+            var modal = document.getElementById('myModal');
+            modal.style.display = "none";
+            remove = document.body.getElementsByClassName('need-remove');
+            console.log('**********', remove.length)
+            while (remove.length > 0) {
+              for (let i = 0; i < remove.length; i++) {
+                remove[i].remove();
+              }
+            }
+          })
           // range.insertNode(addModal());
           // range.insertNode(document.createTextNode(text[0]));
           // range.insertNode(initElement(text[2]));
@@ -98,18 +157,25 @@ function replaceSelectedText() {
 //     modal.toggle();
 //   })
 // })
-function addModalContext() {
-  return `<p>abc</p>`
+function addModalContext_String(string) {
+  return `<span class="need-remove">${string}</span>`
 }
-document.body.getElementsByClassName('modal-context')[0].insertAdjacentHTML("beforeend", addModalContext());
-document.body.getElementsByClassName('grammar-box')[0].addEventListener('click', function () {
-  var modal = document.getElementById('myModal');
-  modal.style.display = "block"
-});
+function addModalContext_Example(ja, vi) {
+  return `<li class="need-remove">
+            <span class="need-remove">${ja}</span>
+            </br>
+            <span class="need-remove">${vi}</span>
+          </li>`
+}
+// document.body.getElementsByClassName('modal-context')[0].insertAdjacentHTML("beforeend", addModalContext());
+// document.body.getElementsByClassName('grammar-box')[0].addEventListener('click', function () {
+//   var modal = document.getElementById('myModal');
+//   modal.style.display = "block"
+// });
 
-document.body.getElementsByClassName('close-jg')[0].addEventListener('click', function () {
-  var modal = document.getElementById('myModal');
-  modal.style.display = "none"
-})
+// document.body.getElementsByClassName('close-jg')[0].addEventListener('click', function () {
+//   var modal = document.getElementById('myModal');
+//   modal.style.display = "none"
+// })
 
 // function call(input) {
